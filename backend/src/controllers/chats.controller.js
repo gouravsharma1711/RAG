@@ -1,18 +1,16 @@
-const generateEmbeddings = require("../services/embeddingLLM.service");
-const { pdfLoader, splitDocumentsIntoChunks } = require("../utils/document_processor")
+const { getRelevantData } = require("../services/pinecone.service");
+
 
 const chatController = async(req,res)=>{
+    const {userMsg }= req.body;
 
-    const docs = await pdfLoader("./public/files/sampleDoc.pdf");
 
-    const chunks = await splitDocumentsIntoChunks(docs);
+    const releventData = await getRelevantData(userMsg);
+    const data = releventData.map((data)=>data.text).join('\n');
 
-    const vectors = await generateEmbeddings(chunks);
-    console.log("vectors : ",vectors);
-    
-    
     res.status(200).json({
         message:"Hello World",
+        data,
         status:200
     })
 }

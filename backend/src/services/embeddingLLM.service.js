@@ -1,39 +1,61 @@
 
 const {GoogleGenerativeAIEmbeddings } = require('@langchain/google-genai')
 
-const embeddings = new GoogleGenerativeAIEmbeddings({
+const embeddingModel = new GoogleGenerativeAIEmbeddings({
     apiKey:process.env.GIMINI_API_KEY,
-    model:"gemini-embedding-2"
+    model:"gemini-embedding-001"
 })
 
 
-async function generateEmbeddings(chunks) {
+async function generateEmbeddingsFromChunks(chunks) {
+    if (!Array.isArray(chunks) || chunks.length === 0) {
+        throw new TypeError("At least one document chunk is required to generate embeddings.");
+    }
 
     try {
-        const texts = chunks.map((chunk)=>chunk.pageContent);
-        console.log("Texts : ",texts[0]);
+
+        const texts = chunks.map((chunk, index) => {
+            if (typeof chunk?.pageContent !== "string" || chunk.pageContent.trim() === "") {
+                throw new Error(`Chunk at position ${index} has no text content.`);
+            }
+            return chunk.pageContent;
+        });
         
         const batchSize = 5;
         const vectors =[];
 
         for(let i=0;i<texts.length;i+=batchSize){
             const batch = texts.slice(i,i+batchSize);
-            const batchVectors = await embeddings.embedDocuments(batch)
+            const batchVectors = await embeddingModel.embedDocuments(batch)
             vectors.push(...batchVectors);
         }
         
-    
-        console.log("Chunks:", chunks.length);
-        console.log("Vectors:", vectors.length);
-        console.log("last vector:", vectors[71]);
-        console.log("Dimensions:", vectors[0]?.length);
-        
+        if(chunks.length !== vectors.length){
+            throw new Error(`Mismatch: ${chunks.length} chunks but ${vectors.length} vectors`);
+        }
+
         return vectors;
     } catch (error) {
-        console.log("Error : ",error.message);
-        
+        throw new Error(`Error generating chunk embeddings: ${error.message || String(error)}`, { cause: error });
     }
 }
 
+async function generateEmbeddingFromQuery(query) {
+    if (typeof query !== "string" || query.trim() === "") {
+        throw new TypeError("A non-empty query is required to generate an embedding.");
+    }
 
-module.exports = generateEmbeddings;
+    try {
+        const embedding = await embeddingModel.embedQuery(query);
+        return embedding
+
+    } catch (error) {
+        throw new Error(`Error generating query embedding: ${error.message || String(error)}`, { cause: error });
+    }
+}
+
+module.exports = {
+    embeddingModel,
+    generateEmbeddingsFromChunks,
+    generateEmbeddingFromQuery
+};
