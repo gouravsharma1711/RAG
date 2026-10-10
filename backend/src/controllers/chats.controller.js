@@ -1,10 +1,12 @@
-const generateResponse = require("../services/LLM.service.js");
+const {
+    generateResponse,
+    classifyMessage,
+} = require("../services/LLM.service.js");
 const { getRelevantData } = require("../services/pinecone.service.js");
-
 
 const chatController = async(req,res)=>{
     try {
-        const {userMsg }= req.body;
+        const {userMsg}= req.body;
 
         if(typeof userMsg !=="string"){
             const e = new Error("Invalid message format. Please provide a string.");
@@ -18,16 +20,21 @@ const chatController = async(req,res)=>{
             throw e;
         }
     
-        const releventData = await getRelevantData(userMsg);
+        const classification = await classifyMessage(userMsg);
+        
+        let llmResponse;
 
-        const data = releventData.map((data)=>data.text).join('\n');
-    
-        const prompt =`
-            context:${data}
-            Question:${userMsg}
-        `;
-    
-        const llmResponse = await generateResponse(prompt);
+        if (classification.type === "small-talk") {
+            llmResponse = classification.reply;
+        } else {
+            const relevantData = await getRelevantData(userMsg);
+            const context = relevantData.map((item) => item.text).join("\n");
+            const prompt = `
+                Context: ${context}
+                Question: ${userMsg}
+            `;
+            llmResponse = await generateResponse(prompt);
+        }
 
         if(!llmResponse || llmResponse.trim() ===""){
             const e = new Error("No response from the LLM");

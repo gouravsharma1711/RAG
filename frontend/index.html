@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBot</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="bg-neutral-900 text-white overflow-x-hidden ">
+    
+     <div class="mx-auto max max-w-4xl pb-44" id="container">
+        <!-- messages -->
+        
+        <div id="welcome-screen" class="flex min-h-[calc(100dvh-12rem)] flex-col items-center justify-center px-6 text-center">
+            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-500/10 text-3xl text-violet-300 shadow-lg shadow-violet-950/30">
+                ✦
+            </div>
+            <h1 class="bg-gradient-to-r from-white via-violet-100 to-violet-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
+                Welcome to Askfolio Bot
+            </h1>
+            <p class="mt-4 max-w-md text-base leading-7 text-neutral-400 sm:text-lg  ">
+                Ask questions about your documents and get clear, source-grounded answers.
+            </p>
+        </div>
+        
+
+        <!-- bottom text Area -->
+        <div class="fixed bottom-0 inset-x-0 flex justify-center items-center bg-neutral-900 z-50">
+            <div class="bg-neutral-800 p-2 rounded-3xl  w-full   max-w-4xl mb-4 mx-4">
+            <textarea class="w-full resize-none outline-none p-4 scrollbar-none" rows="2" id="input" placeholder="Ask Anything Related to the Document"></textarea>
+            <div class="flex justify-end items-center">
+                <button class="bg-white px-4 py-1 text-black rounded-full cursor-pointer hover:bg-gray-300" id="askButton">Ask</button>
+            </div>
+         </div>
+        </div>
+     </div>
+
+
+    <script src="./script.js"></script>
+</body>
+</html>
