@@ -140,7 +140,7 @@ async function submitMessage() {
 }
 
 async function apiCaller(userMsg) {
-  const response = await fetch("http://localhost:3000/api/v1/chats", {
+  const response = await fetch("https://rag-backend-778w.onrender.com/api/v1/chats", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
